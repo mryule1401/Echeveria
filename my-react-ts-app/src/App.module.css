@@ -1,0 +1,31 @@
+/* App.css */
+
+body {
+  margin: 0; /* Remove default body margin */
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items to the start without extra spacing */
+  align-items: stretch; /* Make children fill the container width */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  margin: 0; /* Ensure no margins are added to the container */
+  padding: 0; /* Remove unwanted padding */
+  box-sizing: border-box; /* Include padding and border in width/height */
+}
+
+.fullScreen {
+  height: 100%; /* Ensure the content takes up the full height of the grid row */
+  overflow: auto; /* Allow overflow for the content */
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
