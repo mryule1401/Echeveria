@@ -1,4 +1,4 @@
-/* Hero section */
+/* Hero section
 .hero {
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   background-color: #348c42;
 }
 
-/* Section generic styling */
+Section generic styling
 .section {
   padding: 4rem 1rem;
   max-width: 1000px;
@@ -90,4 +90,4 @@
   background-color: #f2f2f2;
   font-size: 0.9rem;
   color: #555;
-}
+} */
