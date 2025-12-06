@@ -55,6 +55,7 @@ const Header: React.FC = () => {
           display: "flex",
           justifyContent: "space-between",
           px: 0,
+          width: "100%",
         }}
       >
         {/* ==== MOBILE MENU BUTTON ==== */}
