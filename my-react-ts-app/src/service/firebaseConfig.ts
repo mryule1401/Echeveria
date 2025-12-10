@@ -1,8 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
 import {
-  connectFirestoreEmulator,
+  getAuth,
+  setPersistence,
+  browserSessionPersistence,
+  connectAuthEmulator,
+} from "firebase/auth";
+import {
   initializeFirestore,
+  connectFirestoreEmulator,
   persistentLocalCache,
   persistentMultipleTabManager,
 } from "firebase/firestore";
@@ -38,29 +43,34 @@ const firebaseConfig = {
     DEFAULT_FIREBASE_CONFIG.measurementId,
 };
 
-console.info(`Firebase project initialised: ${firebaseConfig.projectId}`);
-// Initialize Firebase
+//Initialize Firebase FIRST
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore with persistent cache
-const db = initializeFirestore(app, {
+// Init auth
+export const auth = getAuth(app);
+
+// Set session-only persistence
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
+    console.info("✅ Auth persistence: SESSION");
+  })
+  .catch((err) => {
+    console.error("❌ Failed to set auth persistence:", err);
+  });
+
+console.info(`Firebase project initialised: ${firebaseConfig.projectId}`);
+
+// Init Firestore
+export const firestore = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager(),
   }),
 });
 
-// Initialize Analytics (optional)
-// const analytics = getAnalytics(app);
+const { VITE_CONNECT_EMULATOR } = import.meta.env;
 
-// Export auth and firestore instances
-export const auth = getAuth(app);
-export const firestore = db;
-
-const {
-  VITE_CONNECT_EMULATOR: connectEmulator
-} = import.meta.env
-
-if (connectEmulator === 'true') {
-  connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(db, "localhost", 8080)
-}
+// ✅ Optional emulator
+// if (VITE_CONNECT_EMULATOR === "true") {
+//   connectAuthEmulator(auth, "http://localhost:9099");
+//   connectFirestoreEmulator(firestore, "localhost", 8080);
+// }

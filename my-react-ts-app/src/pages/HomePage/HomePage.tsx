@@ -7,10 +7,10 @@ import {
   Paper,
 } from "@mui/material";
 
-import Header from "../../components/ui/header";
-import Intro from '../../components/ui/intro';
-import Footer from '../../components/ui/footer';
-import Contact from '../../components/ui/contact';
+import Header from "./components/ui/header";
+import Intro from './components/ui/intro';
+import Footer from './components/ui/footer';
+import Contact from './components/ui/contact';
 
 const HomePage: React.FC = () => {
   return (

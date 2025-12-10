@@ -50,6 +50,7 @@ const validatePasswordStrength = (password: string): PasswordValidation => {
 
 const LoginPage: React.FC = () => {
     const [active, setActive] = useState(false);
+    const [justSignedUp, setJustSignedUp] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -94,6 +95,8 @@ const LoginPage: React.FC = () => {
     useEffect(() => {
         if (isSignUp) {
             setPasswordValidation(validatePasswordStrength(password));
+            setJustSignedUp(true);
+            setSuccess("Account created! Please sign in.");
         }
     }, [password, isSignUp]);
 
@@ -113,6 +116,11 @@ const LoginPage: React.FC = () => {
 
         return () => clearTimeout(timer);
     }, []);
+    useEffect(() => {
+        if (currentUser) {
+            navigate("/app", { replace: true });
+        }
+    }, [currentUser, navigate]);
 
     useEffect(() => {
         if (!currentUser && pageReady) {
@@ -208,14 +216,8 @@ const LoginPage: React.FC = () => {
             if (isSignUp) {
                 await signUpWithEmailPassword(email, password, "client");
                 setSuccess("Account created successfully! You can now sign in.");
-                // Auto-switch to sign in mode after successful registration
-                setTimeout(() => {
-                    setIsSignUp(false);
-                    setSuccess(null);
-                }, 1500);
             } else {
                 await signInWithEmailPassword(email, password);
-                // Redirect handled by PrivateRoute
             }
         } catch (err: any) {
             console.error("Auth failed:", err);
@@ -352,14 +354,14 @@ const LoginPage: React.FC = () => {
         );
     }
 
-    if (currentUser && !authLoading) {
+    if (currentUser && !authLoading && !justSignedUp) {
         return <Navigate to="/app" replace />;
     }
     return (
         <div id="app">
             <div id="container" className={`container ${active ? "active" : ""}`}>
                 <div className="form-container login">
-                    <form>
+                    <form onSubmit={handleEmailSubmit}>
                         <h2>Sign In</h2>
                         <TextField
                             className="user-infor"
@@ -447,6 +449,7 @@ const LoginPage: React.FC = () => {
                                 },
                             }}
                         />
+
                         <div className="check">
                             <label>
                                 <input type="checkbox" />
@@ -455,8 +458,21 @@ const LoginPage: React.FC = () => {
                             <a href="#">Forgot Password</a>
                         </div>
                         <div className="button">
-                            <button type="submit" className="btn">Sign In</button>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                                disabled={loading || !!socialLoading}
+                            >
+                                {loading ? (
+                                    <CircularProgress size={24} />
+                                ) : (
+                                    "Sign In"
+                                )}
+                            </Button>
                         </div>
+
                         <Stack direction="column" spacing={2} sx={{ width: "100%" }}>
                             <Button
                                 fullWidth
@@ -478,23 +494,51 @@ const LoginPage: React.FC = () => {
 
 
                 <div className="form-container register">
-                    <form>
+                    <form onSubmit={handleEmailSubmit}>
                         <h2>Sign Up</h2>
                         <div className="input">
-                            <TextField type="email" placeholder="Email" required />
+                            <TextField
+                                type="email"
+                                placeholder="Email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)} />
                             <i className="fa fa-envelope"></i>
                         </div>
                         <div className="input">
-                            <TextField type="text" placeholder="Password" required />
+                            <TextField
+                                type="password"
+                                placeholder="Password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)} />
                             <i className="fa fa-lock"></i>
                         </div>
-                        <div className="input">
-                            <TextField type="text" placeholder="Confirm Password" required />
+                        <div className="password">
+                            <TextField
+                                type="text"
+                                placeholder="Confirm Password"
+                                required
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)} />
                             <i className="fa fa-lock"></i>
                         </div>
                         <div className="button">
-                            <button type="submit" className="btn">Sign Up</button>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                                disabled={loading || !!socialLoading}
+                            >
+                                {loading ? (
+                                    <CircularProgress size={24} />
+                                ) : (
+                                    "Sign Up"
+                                )}
+                            </Button>
                         </div>
+
                     </form>
                 </div>
 
@@ -503,17 +547,33 @@ const LoginPage: React.FC = () => {
                         <div className="toggle-panel toggle-left">
                             <h1>Welcome Back!</h1>
                             <p>Enter your personal details to use all of site features</p>
-                            <button type="button" onClick={() => setActive(false)} className="hidden">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setActive(false);     // show login panel
+                                    setIsSignUp(false);   // logic = sign in
+                                }}
+                                className="hidden"
+                            >
                                 Sign In
                             </button>
                         </div>
+
                         <div className="toggle-panel toggle-right">
                             <h1>Welcome!</h1>
                             <p>Register with your personal details to use all of site features</p>
-                            <button type="button" onClick={() => setActive(true)} className="hidden">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setActive(true);      // show register panel
+                                    setIsSignUp(true);    // logic = sign up
+                                }}
+                                className="hidden"
+                            >
                                 Sign Up
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
